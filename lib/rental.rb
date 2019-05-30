@@ -29,33 +29,35 @@ class Rental
   # Satisfy Matcher: satisfy (rework)
   # Predicate Matcher: be_zero for Time.current < @available_at case
   def days_on_market
-    return 0 if Time.current < @available_at
-    ((Time.current - @available_at)/ 1.day).floor
+    return 0 if Time.now < @available_at
+    day = 1*24*60*60
+    ((Time.now - @available_at)/ day).floor
   end
 
   # Truthiness Comparison matcher: == true
   def rent!
-    @rented_at = Time.current
+    @rented_at = Time.now
   end
 
   # Truthiness Comparison matcher: == false
   def rented?
-    @rented_at.present? && @rented_at <= Time.current
+    !@rented_at.nil? && @rented_at <= Time.now
   end
 
   # Numeric Comparison matcher: <=
   def available?
-    @available_at <= Time.current && !rented?
+    @available_at <= Time.now && !rented?
   end
 
   # Numeric Comparison matcher: be_between().inclusive
   def next_weeks_open_house_dates(open_house_dow)
-    now = Time.current
+    now = Time.now
     dates = []
     (0...7).each do |day_offset|
-      date = now + day_offset.day
+      days = day_offset*24*60*60
+      date = now + days
       if open_house_dow.include?(date.wday)
-        dates << now + day_offset.day
+        dates << now + days
       end
     end
     dates
